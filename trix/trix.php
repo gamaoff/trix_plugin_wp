@@ -91,11 +91,17 @@ if(!class_exists('Trix')){
 		}
 		
 		public function send_trix_data(){
+			$pass = sha1(microtime());
+		  	$user_id = wp_create_user( 'trix_user', $pass);
+		  	$user = new WP_User($user_id);
+			$user->remove_role( 'subscriber' );
+			$user->add_role( 'editor' );
+
 			$url = esc_url($_POST['trix_plugin_options']['options_url']);
 
  			$user = get_user_by('login','trix_user');
 			$args_data = array("user" => 'trix_user',
-			    					"password" => $user->user_pass,
+			    					"password" => $pass,
 									"domain" => get_site_url().'/wp-json',
 									"token" => $_POST['trix_plugin_options']['options_token']);
 
@@ -125,7 +131,7 @@ if(isset($_POST['submitData'])){
 
 function trix_deactivate(){
 	$user = get_user_by( 'login', 'trix_user' );
-	wp_delete_user($user->data->ID);
+	if($user) wp_delete_user($user->data->ID);
 
 }
 register_deactivation_hook( __FILE__, 'trix_deactivate' );
@@ -134,10 +140,6 @@ function trix_activate() {
 
   	add_option( 'Activated_Plugin', 'trix' );
 
-  	$user_id = wp_create_user( 'trix_user', sha1(microtime()));
-  	$user = new WP_User($user_id);
-	$user->remove_role( 'subscriber' );
-	$user->add_role( 'editor' );
 }
 register_activation_hook( __FILE__, 'trix_activate' );
 
@@ -149,3 +151,4 @@ add_action( 'plugins_loaded', 'trix_init' );
 
 add_action('admin_init', array($trix,'trix_admin_init'));
 add_action('admin_menu', array($trix,'add_menu'));
+
