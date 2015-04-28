@@ -15,10 +15,6 @@ if(!defined('ABSPATH'))	exit();
 
 if(!function_exists('get_user_by')) require_once(ABSPATH . "wp-includes/pluggable.php");
 
-// include_once(dirname(__FILE__).'/json-rest-api/plugin.php');
-// include_once(dirname(__FILE__).'/json-rest-api/basic-auth.php');
-
-
 if(!class_exists('Trix')){
 
 	class Trix {
@@ -31,9 +27,6 @@ if(!class_exists('Trix')){
 			$this->options = get_option('trix_plugin_options');
 			$this->status = get_option('trix_plugin_response["code"]');
 			$this->error_message = get_option('trix_plugin_response["message"]');
-
-			// add_action('admin_init', array($this,'trix_admin_init'));
-			// add_action('admin_menu', array($this,'add_menu'));
 		}
 
 		public function trix_admin_init() {
@@ -87,9 +80,7 @@ if(!class_exists('Trix')){
 			}else echo $this->error_message;
 		}
 
-		public function options_main_section_cb(){
-			# code...
-		}
+		public function options_main_section_cb(){}
 
 		public function validate_trix_settings($plugin_options){
 			$token_sanitized = sanitize_text_field($plugin_options['options_token']);
@@ -98,7 +89,6 @@ if(!class_exists('Trix')){
 			}
 			return $plugin_options;
 		}
-
 		
 		public function send_trix_data(){
 			$url = esc_url($_POST['trix_plugin_options']['options_url']);
@@ -120,13 +110,9 @@ if(!class_exists('Trix')){
 			} else {
 				update_option('trix_plugin_response["code"]', $response['response']['code']);
 				update_option('trix_plugin_response["message"]', '');
-			}//SERIALIZAR O ARRAY "trix_plugin_response"
-				
+			}				
 		}
-
-
 	}
-
 }
 
 $trix = new Trix;
@@ -161,6 +147,5 @@ function trix_init() {
 }
 add_action( 'plugins_loaded', 'trix_init' );
 
-			add_action('admin_init', array($trix,'trix_admin_init'));
-			add_action('admin_menu', array($trix,'add_menu'));
-
+add_action('admin_init', array($trix,'trix_admin_init'));
+add_action('admin_menu', array($trix,'add_menu'));
